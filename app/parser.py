@@ -1,5 +1,4 @@
-def parseText():
-    nlp = spacy.load('en')
+def parseText(nlp):
     inText = input("please provide sentence to parse\n")
     tokens = nlp(inText)
     lemmas = []
@@ -8,24 +7,60 @@ def parseText():
         lemmas.append(token.lemma_)
         deps.append(token.dep_)
     lemmas = ['$' if lemma in ['dollar', 'usd'] else lemma for lemma in lemmas] # map text to symbol
-    validation = checkInput(lemmas)
+    validation = utils.globalValidation(lemmas)
     if validation:
         print(validation)
-        parseText()
+        parseText(nlp)
     else:
+        lemmas = utils.toSublists(lemmas, 'and') # split to subsentences by 'and'
+        deps = utils.toSublists(deps, 'cc')
         zippedPairs = zip(lemmas, deps) # parsed lemmas and syntactic dependency
-        print(list(zippedPairs)) # TODO add final logic stub
+        getResult(zippedPairs, nlp)
 
 
-def checkInput(lemmas):
-    if '$' not in lemmas:
-        return "please provide valid currency"
-        # TODO better logic for many items in same sentence 
-    elif 'add' not in lemmas:
-        return "please provide a valid operation type (eg Add)"
-    else: 
-        # TODO ask specifically for item/price if still here
-        return None 
+def getResult(zippedPairs, nlp):
+    correctCounter = 0
+    errorCounter = 0
+    validationMessage = ''
+    for sbsntc in zippedPairs:
+        # print(sbsntc[0], sbsntc[1])
+        validation = utils.subsentenceValidation(sbsntc[0], sbsntc[1])
+        if validation:
+            validationMessage += validation
+            errorCounter += 1
+        else:
+            getResultForSubsentence(sbsntc)
+            correctCounter += 1
+    showResult(correctCounter, errorCounter, validationMessage, nlp)
+
+
+def showResult(correctCounter, errorCounter, msg, nlp):
+    if correctCounter > 0:
+        print(str(correctCounter) + " subsentences parsed correctly")
+    if errorCounter > 0:
+        print(str(errorCounter) + " subsentences with errors")
+        print(msg)
+        parseText(nlp)
+    if correctCounter == 0:
+        pass # TODO escape sequence here
+
+    inText = input("do you want to add another item? (y/n)\n")
+    parseText(nlp) if inText.lower() == 'y' else None
+
+
+def getResultForSubsentence(sbsntc):
+    lemmas = sbsntc[0]
+    print(lemmas)
+    deps = sbsntc[1]
+    print(deps)
+    # TODO final logic for each subsentence
+
+
+def init():
+    return spacy.load('en') # load only once
+
 
 import spacy
-parseText()
+import utils
+nlp = init()
+parseText(nlp)

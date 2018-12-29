@@ -31,14 +31,15 @@ def getResult(zippedPairs, nlp):
         else:
             getResultForSubsentence(sbsntc)
             correctCounter += 1
-    showResult(correctCounter, errorCounter, validationMessage, nlp)
+    showGlobalResult(correctCounter, errorCounter, validationMessage, nlp)
 
 
-def showResult(correctCounter, errorCounter, msg, nlp):
+def showGlobalResult(correctCounter, errorCounter, msg, nlp):
+    print('\n')
     if correctCounter > 0:
         print(str(correctCounter) + " subsentences parsed correctly")
     if errorCounter > 0:
-        print(str(errorCounter) + " subsentences with errors")
+        print(str(errorCounter) + " subsentences with errors:")
         print(msg)
         parseText(nlp)
     if correctCounter == 0:
@@ -48,12 +49,33 @@ def showResult(correctCounter, errorCounter, msg, nlp):
     parseText(nlp) if inText.lower() == 'y' else None
 
 
-def getResultForSubsentence(sbsntc):
+def getResultForSubsentence(sbsntc): # early
     lemmas = sbsntc[0]
-    print(lemmas)
+    # print(lemmas)
     deps = sbsntc[1]
-    print(deps)
-    # TODO final logic for each subsentence
+    # print(deps)
+    prepIdx = deps.index('prep')
+    price = getPrice(lemmas, prepIdx)
+    objIdx = deps.index('dobj') if 'dobj' in deps \
+        else deps.index('conj')
+    obj = lemmas[objIdx]
+    amount = getAmount(lemmas, deps, objIdx)
+    print("\nobject: " + obj, "price: " + price, "amount: " + amount)
+    # print("-----------------------")
+
+
+def getPrice(lemmas, prepIdx):
+    """get price by prep position""" 
+    price = lemmas[prepIdx + 1] + lemmas[prepIdx + 2] # price + currency
+    price = '$' + price[:-1] if price[-1:] == '$' else price
+    return price
+
+
+def getAmount(lemmas, deps, objIdx):
+    """get amount by obj position"""
+    amount = lemmas[objIdx - 1] if deps[objIdx - 1] == 'nummod' \
+        else lemmas[objIdx + 1]
+    return amount
 
 
 def init():

@@ -7,12 +7,18 @@ def globalValidation(lemmas):
         return None
 
 
-def subsentenceValidation(lemmas, deps): # early version
-    if 'dobj' not in deps and 'conj' not in deps and 'pobj' not in deps:
+def subsentenceValidation(lemmas, deps):
+    """early version **
+    legit subsentence should have one object, currency,
+    exactly two nummods (amount, price) and one prep - most probably for
+    """
+    if 'dobj' not in deps and 'conj' not in deps \
+        or deps.count('dobj') + deps.count('conj') != 1:
         return "please provide valid object"
     elif '$' not in lemmas:
         return "please provide valid currency ($)\n"
-    elif 'nummod' not in deps or 'prep' not in deps:
+    elif deps.count('nummod') + deps.count('nmod') != 2 \
+        or deps.count('prep') != 1:
         return "subsentence is not valid"
     else:
         return None

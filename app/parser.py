@@ -1,5 +1,5 @@
 def parseText(nlp):
-    inText = input("please provide sentence to parse\n")
+    inText = input("please provide a sentence to parse\n")
     tokens = nlp(inText)
     lemmas = []
     deps = []
@@ -41,12 +41,25 @@ def showGlobalResult(correctCounter, errorCounter, msg, nlp):
     if errorCounter > 0:
         print(str(errorCounter) + " subsentences with errors:")
         print(msg)
-        parseText(nlp)
     if correctCounter == 0:
-        pass # TODO escape sequence here
+        getExactData()
 
     inText = input("do you want to add another item? (y/n)\n")
     parseText(nlp) if inText.lower() == 'y' else None
+
+
+def getExactData():
+    print("\nfailed to fetch any data from sentence.")
+    obj = input("which item do you want to add?\n")
+    price = input("what is the price for the item?\n")
+    amount = input("how many items?\n")
+    price = ''.join(c for c in price if c.isdigit())
+    if amount.isdigit() and price:
+        price = '$' + price
+        print("\nobject: " + obj, "price: " + price, "amount: " + amount)
+        # TODO save to db
+    else:
+        print("parse failed")
 
 
 def getResultForSubsentence(sbsntc): # early
@@ -61,6 +74,7 @@ def getResultForSubsentence(sbsntc): # early
     obj = lemmas[objIdx]
     amount = getAmount(lemmas, deps, objIdx)
     print("\nobject: " + obj, "price: " + price, "amount: " + amount)
+    # TODO save to db
     # print("-----------------------")
 
 

@@ -1,5 +1,5 @@
 def parseText(nlp):
-    inText = input("please provide a sentence to parse\n")
+    inText = utils.initialParse(input("please provide a sentence to parse\n"))
     tokens = nlp(inText)
     lemmas = []
     deps = []
@@ -53,7 +53,7 @@ def getExactData():
     obj = input("which item do you want to add?\n")
     price = input("what is the price for the item?\n")
     amount = input("how many items?\n")
-    price = ''.join(c for c in price if c.isdigit())
+    price = ''.join(c for c in price if c.isdigit() or c in ['.', ','])
     if amount.isdigit() and price:
         price = '$' + price
         print("\nobject: " + obj, "price: " + price, "amount: " + amount)
@@ -69,13 +69,11 @@ def getResultForSubsentence(sbsntc): # early
     # print(deps)
     prepIdx = deps.index('prep')
     price = getPrice(lemmas, prepIdx)
-    objIdx = deps.index('dobj') if 'dobj' in deps \
-        else deps.index('conj')
+    objIdx = prepIdx - 1
     obj = lemmas[objIdx]
     amount = getAmount(lemmas, deps, objIdx)
-    print("\nobject: " + obj, "price: " + price, "amount: " + amount)
+    print("object: " + obj, "price: " + price, "amount: " + amount + '\n')
     # TODO save to db
-    # print("-----------------------")
 
 
 def getPrice(lemmas, prepIdx):
@@ -87,8 +85,8 @@ def getPrice(lemmas, prepIdx):
 
 def getAmount(lemmas, deps, objIdx):
     """get amount by obj position"""
-    amount = lemmas[objIdx - 1] if deps[objIdx - 1] == 'nummod' \
-        else lemmas[objIdx + 1]
+    amount = lemmas[objIdx + 1] if deps[objIdx + 1] == 'nummod' \
+        else lemmas[objIdx - 1]
     return amount
 
 

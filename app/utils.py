@@ -9,17 +9,16 @@ def globalValidation(lemmas):
 
 def subsentenceValidation(lemmas, deps):
     """early version **
-    legit subsentence should have one object, currency,
-    exactly two nummods (amount, price) and one prep - most probably for
+    legit subsentence should have one object, currency 
+    and one prep - most probably for
     """
     if 'dobj' not in deps and 'conj' not in deps \
         or deps.count('dobj') + deps.count('conj') != 1:
-        return "please provide valid object"
+        return "please provide valid object\n"
     elif '$' not in lemmas:
         return "please provide valid currency ($)\n"
-    elif deps.count('nummod') + deps.count('nmod') != 2 \
-        or deps.count('prep') != 1:
-        return "subsentence is not valid"
+    elif deps.count('prep') != 1:
+        return "subsentence is not valid\n"
     else:
         return None
 
@@ -33,3 +32,8 @@ def toSublists(aList, keyword):
         resultSublist.pop(0) # remove keyword for each subsentence
         resultList.append(resultSublist)
     return resultList
+
+
+def initialParse(inText):
+    return inText.replace(',', ' and')
+    

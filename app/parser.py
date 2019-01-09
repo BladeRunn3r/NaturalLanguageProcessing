@@ -84,10 +84,16 @@ def getPrice(lemmas, prepIdx):
 
 
 def getAmount(lemmas, deps, objIdx):
-    """get amount by obj position"""
-    amount = lemmas[objIdx + 1] if deps[objIdx + 1] == 'nummod' \
-        else lemmas[objIdx - 1]
-    return amount
+    """get amount by obj position
+    if amount is not parsed correctly (is not digit)
+    then it is not passed and assumed as 1
+    """
+    amount = 0
+    if deps[objIdx - 1] == 'nummod':
+        amount = lemmas[objIdx - 1] 
+    if not amount:
+        amount = 1
+    return str(amount)
 
 
 def init():

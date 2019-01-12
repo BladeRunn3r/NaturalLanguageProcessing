@@ -1,9 +1,10 @@
 import numpy as np
 
 def globalValidation(lemmas):
-    if 'add' not in lemmas:
-        return "please provide a valid operation type (eg Add)\n"
-    else: 
+    keywords = ['add', 'put', 'insert']
+    if not any(keyw in lemmas for keyw in keywords):
+        return "please provide a valid operation type (Add, Put, Insert)\n"
+    else:
         return None
 
 
